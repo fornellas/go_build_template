@@ -2,22 +2,34 @@ package version
 
 import (
 	_ "embed"
-	"strings"
+	"fmt"
+	"runtime/debug"
 )
 
-// Version is the version of the built binary
-type Version string
-
-//go:generate sh -c "git describe --tags --always  > .version"
-//go:embed .version
-var version string
-
-// IsCurrent returns whether Version is the same as the current binary.
-func (v Version) IsCurrent() bool {
-	return v == GetVersion()
-}
-
 // GetVersion returns the Version for the current binary.
-func GetVersion() Version {
-	return Version(strings.TrimSuffix(version, "\n"))
+func GetVersion() string {
+
+	info, ok := debug.ReadBuildInfo()
+	if !ok {
+		return "UNKNOWN (no ReadBuildInfo())"
+	}
+
+	settings := map[string]string{}
+	for _, setting := range info.Settings {
+		settings[setting.Key] = setting.Value
+	}
+
+	revision, ok := settings["vcs.revision"]
+	if !ok {
+		return `UNKNOWN (no "vcs.revision")`
+	}
+
+	version := revision
+
+	modified, ok := settings["vcs.modified"]
+	if ok && modified == "true" {
+		version = fmt.Sprintf("%s (dirty)", version)
+	}
+
+	return version
 }
