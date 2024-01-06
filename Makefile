@@ -3,6 +3,8 @@ help:
 SHELL := /bin/bash
 .ONESHELL:
 
+NAME := $(notdir $(CURDIR))
+
 XDG_CACHE_HOME ?= $(HOME)/.cache
 RESONANCE_CACHE ?= $(XDG_CACHE_HOME)/rrb
 
@@ -66,7 +68,7 @@ GOARCHS_AGENT := 386 amd64 arm arm64
 
 GOIMPORTS_VERSION :=  v0.15.0
 GOIMPORTS := $(GO) run golang.org/x/tools/cmd/goimports@$(GOIMPORTS_VERSION)
-GOIMPORTS_LOCAL := github.com/fornellas/go_build_template/
+GOIMPORTS_LOCAL := github.com/fornellas/$(NAME)/
 
 STATICCHECK_VERSION := v0.4.6
 STATICCHECK := $(GO) run honnef.co/go/tools/cmd/staticcheck@$(STATICCHECK_VERSION)
@@ -310,13 +312,13 @@ help: build-help
 
 .PHONY: build
 build: go go-generate
-	$(GO) build -o go_build_template.$(GOOS).$(GOARCH) $(GO_BUILD_FLAGS) .
+	$(GO) build -o $(NAME).$(GOOS).$(GOARCH) $(GO_BUILD_FLAGS) .
 
 .PHONY: clean-build
 clean-build:
 	$(GO) env &>/dev/null && $(GO) clean -r -cache -modcache
 	rm -f version/.version
-	rm -f go_build_template.*.*
+	rm -f $(NAME).*.*
 clean: clean-build
 
 ##
