@@ -11,7 +11,7 @@ func GetVersion() string {
 
 	info, ok := debug.ReadBuildInfo()
 	if !ok {
-		return "UNKNOWN (no ReadBuildInfo())"
+		return "unknown revision (no ReadBuildInfo())"
 	}
 
 	settings := map[string]string{}
@@ -21,15 +21,15 @@ func GetVersion() string {
 
 	revision, ok := settings["vcs.revision"]
 	if !ok {
-		return `UNKNOWN (no "vcs.revision")`
+		return `unknown revision (no "vcs.revision")`
 	}
-
-	version := revision
 
 	modified, ok := settings["vcs.modified"]
 	if ok && modified == "true" {
-		version = fmt.Sprintf("%s (dirty)", version)
+		revision = fmt.Sprintf("%s (modified)", revision)
 	}
+
+	version := fmt.Sprintf("%s (%s)", info.Main.Version, revision)
 
 	return version
 }
